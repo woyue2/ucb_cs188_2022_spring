@@ -120,7 +120,7 @@ class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
     def chooseAction(self, gameState):
         return KeyboardAgent.getAction(self, gameState)
 
-from distanceCalculator import Distancer
+from distanceCalculator import Distancer, manhattanDistance
 from game import Actions
 from game import Directions
 
@@ -149,5 +149,15 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        positions = [max(distribution.items(), key=lambda x: x[1])[0] for distribution in livingGhostPositionDistributions]
+        closest_position = min(((position, self.distancer.getDistance(pacmanPosition, position)) for position in positions), key=lambda x: x[1])[0]
+        final_action = None
+        min_distance = float('inf')
+        for action in legal:
+            position = Actions.getSuccessor(pacmanPosition, action)
+            distance = self.distancer.getDistance(position, closest_position)
+            if distance < min_distance:
+                min_distance = distance
+                final_action = action
+        return final_action
         "*** END YOUR CODE HERE ***"
